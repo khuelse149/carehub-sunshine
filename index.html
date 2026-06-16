@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CareHub · DeEtte</title>
+<style>
+  :root{
+    --bg:#fffdf4; --card:#ffffff; --border:#f0e6cc;
+    --text:#44403c; --head:#292524; --muted:#78716c; --faint:#a8a29e; --stone100:#f5f3ec;
+    --gold:#d97706; --gold-dark:#b45309; --gold-text:#b45309; --sun:#fbbf24;
+    --gold-bg:#fffbeb; --gold-bd:#fde68a;
+    --green:#16a34a; --green-bg:#f0fdf4; --green-bd:#bbf7d0;
+    --warn:#ea580c; --warn-text:#9a3412; --warn-bg:#fff7ed; --warn-bd:#fed7aa;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 16px 120px}
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{display:flex;height:38px;width:38px;align-items:center;justify-content:center;border-radius:12px;
+    background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;box-shadow:0 2px 8px rgba(245,158,11,.35)}
+  h1{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0;color:var(--head)}
+  .sub{margin:4px 0 0;font-size:14px;color:var(--muted)}
+  .topright{text-align:right;font-size:14px}
+  .topright .d{font-weight:600;color:var(--text);margin:0}
+  .topright .m{font-size:12px;color:var(--faint);margin:2px 0 0}
+  @media(max-width:560px){.topright{display:none}}
+
+  .hero{position:relative;overflow:hidden;border:1px solid var(--gold-bd);border-radius:20px;padding:22px 22px 24px;margin-bottom:18px;
+    background:linear-gradient(135deg,#fef3c7 0%,#fffaf0 65%)}
+  .hero h2{margin:0;font-size:19px;font-weight:700;color:var(--head)}
+  .hero p{margin:6px 0 0;font-size:14px;color:#6b5b3e;max-width:80%}
+  .hero .sundeco{position:absolute;right:-16px;top:-16px;color:var(--sun);opacity:.85}
+
+  .card{border:1px solid var(--border);background:var(--card);border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(120,90,20,.05);margin-bottom:14px}
+  .card.flush{padding:0}
+  .card.warm{background:var(--gold-bg);border-color:var(--gold-bd)}
+  .card.warn{background:var(--warn-bg);border-color:var(--warn-bd)}
+  .card.click{cursor:pointer;transition:box-shadow .15s,transform .1s}
+  .card.click:hover{box-shadow:0 6px 18px rgba(180,130,30,.12)}
+  .sec{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gold-text);margin:24px 2px 10px}
+  .sec.first{margin-top:2px}
+  .muted{color:var(--muted)} .faint{color:var(--faint)} .sm{font-size:14px}
+  .row{display:flex;align-items:center;gap:12px}
+  .grow{flex:1}
+  .right{text-align:right}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .stat-label{display:flex;align-items:center;gap:6px;color:var(--gold-text);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .stat-num{font-size:30px;font-weight:700;color:var(--head);margin:8px 0 4px}
+  .stat-sub{font-size:12px;color:var(--muted);margin:0}
+  .pill{display:inline-block;border-radius:999px;background:var(--gold-bg);color:var(--gold-text);border:1px solid var(--gold-bd);font-size:12px;font-weight:600;padding:4px 12px;white-space:nowrap}
+  .tag{display:inline-block;border-radius:999px;background:var(--stone100);color:var(--muted);font-size:12px;font-weight:500;padding:2px 10px}
+  .avatar{display:flex;height:36px;width:36px;align-items:center;justify-content:center;border-radius:999px;font-size:12px;font-weight:700;flex:0 0 auto}
+  .av-D{background:#ffedd5;color:#c2410c}.av-S{background:#ede9fe;color:#6d28d9}.av-Y{background:#fef3c7;color:#b45309}
+  .upd{display:flex;gap:12px;margin-bottom:12px}
+  .upd:last-child{margin-bottom:0}
+  .name{font-weight:600;color:var(--head)}
+  .when{color:var(--faint)}
+
+  .med{display:flex;align-items:center;gap:16px;border:1px solid var(--border);background:#fff;border-radius:16px;padding:16px 18px;margin-bottom:12px;cursor:pointer;transition:border-color .15s,background .15s}
+  .med:hover{border-color:var(--gold-bd)}
+  .med.on{background:var(--green-bg);border-color:var(--green-bd)}
+  .check{display:flex;height:36px;width:36px;align-items:center;justify-content:center;border-radius:999px;border:1px solid #ddd6c4;color:transparent;flex:0 0 auto}
+  .med.on .check{background:var(--green);border-color:var(--green);color:#fff}
+  .med-name{margin:0;font-weight:600;color:var(--head)}
+  .time{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:14px;font-weight:500;color:var(--muted);margin:0}
+  .refill{font-size:12px;color:var(--faint);margin:2px 0 0}
+  .refill.low{color:var(--warn);font-weight:700}
+
+  .list .item{display:flex;align-items:center;gap:12px;padding:16px 18px;border-top:1px solid #f4efe2;cursor:pointer;text-align:left;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;font:inherit}
+  .list .item:first-child{border-top:0}
+  .list .item:hover{background:#fffaf0}
+  .box{display:flex;height:24px;width:24px;align-items:center;justify-content:center;border-radius:6px;border:1px solid #ddd6c4;color:transparent;flex:0 0 auto}
+  .item.done .box{background:var(--gold);border-color:var(--gold);color:#fff}
+  .item.done .txt{color:var(--faint);text-decoration:line-through}
+  .txt{flex:1;font-size:14px;color:var(--text)}
+
+  .qbox{margin-top:12px;border-radius:12px;background:#fdf8ec;padding:12px}
+  .qbox p{margin:0 0 4px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gold-text)}
+  .qbox li{font-size:14px;color:var(--muted);list-style:none;margin:2px 0}
+  .qbox ul{margin:0;padding:0}
+
+  textarea{width:100%;resize:none;border:1px solid var(--border);border-radius:12px;padding:12px;font:inherit;font-size:14px;color:var(--text);background:#fffdf8}
+  textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  .btn{border:0;border-radius:12px;background:var(--gold);color:#fff;font:inherit;font-size:14px;font-weight:600;padding:10px 16px;cursor:pointer}
+  .btn:hover{background:var(--gold-dark)}
+  .btn-row{display:flex;justify-content:flex-end;margin-top:8px}
+  .link{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--gold-text);font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:0}
+  .sec-row{display:flex;align-items:center;justify-content:space-between}
+
+  .irow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .irow:last-child{margin-bottom:0}
+  .ibadge{display:flex;height:32px;width:32px;align-items:center;justify-content:center;border-radius:10px;background:var(--gold-bg);color:var(--gold-text);flex:0 0 auto}
+  .ilabel{margin:0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--faint)}
+  .ival{margin:0;font-size:14px;font-weight:500;color:var(--text)}
+  .chk-line{display:flex;align-items:center;gap:12px;padding:16px 18px;border-top:1px solid #f4efe2;font-size:14px;color:var(--text);cursor:pointer}
+  .chk-line:first-child{border-top:0}
+  .chk-line input{height:18px;width:18px;accent-color:var(--gold)}
+
+  .res{display:flex;align-items:center;gap:14px;padding:16px 18px;border-top:1px solid #f4efe2}
+  .res:first-child{border-top:0}
+  .res .rtitle{margin:0;font-weight:600;color:var(--head);font-size:14px}
+  .res .rsub{margin:2px 0 0;font-size:13px;color:var(--muted)}
+  .rbtn{border:1px solid var(--gold-bd);color:var(--gold-text);background:var(--gold-bg);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap}
+  .rbtn:hover{background:#fef3c7}
+  .nudge{margin-top:12px;border-radius:12px;background:#fff7ed;border:1px solid var(--warn-bd);padding:12px;font-size:13px;color:var(--warn-text)}
+  .event{border-color:var(--gold-bd);background:linear-gradient(135deg,#fffaf0,#ffffff)}
+  .event-top{display:flex;gap:14px;align-items:center}
+  .event-date{display:flex;flex-direction:column;align-items:center;justify-content:center;width:54px;height:60px;border-radius:14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;flex:0 0 auto;box-shadow:0 2px 8px rgba(245,158,11,.32)}
+  .event-date .mon{font-size:11px;font-weight:700;letter-spacing:.08em}
+  .event-date .day{font-size:22px;font-weight:800;line-height:1.05}
+  .event-title{margin:0;font-weight:700;color:var(--head);font-size:16px}
+  .event-meta{margin:3px 0 0;font-size:13px;color:var(--gold-text);font-weight:600}
+  .event-row{display:flex;align-items:flex-start;gap:10px;margin-top:12px;font-size:14px;color:var(--text)}
+  .event-row svg{color:var(--gold-text);flex:0 0 auto;margin-top:1px}
+  .event-desc{margin:12px 0 0;font-size:13px;color:var(--muted)}
+  .event-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .cal-title{font-size:17px;font-weight:700;color:var(--head)}
+  .cal-nav{display:flex;gap:8px}
+  .cal-nav button{height:34px;width:34px;border:1px solid var(--border);background:#fff;border-radius:10px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
+  .cal-nav button:hover{background:var(--gold-bg);color:var(--gold-text)}
+  .grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .wd{text-align:center;font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;padding-bottom:4px}
+  .cell{position:relative;min-height:84px;border-radius:12px;border:1px solid transparent;background:#fff;padding:5px 5px 4px;cursor:pointer;transition:background .12s;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+  .cell:hover{background:var(--gold-bg)}
+  .cell.blank{background:transparent;cursor:default;border:0}
+  .cell.blank:hover{background:transparent}
+  .cell .num{font-size:13px;font-weight:600;color:var(--text)}
+  .cell.today{border-color:var(--gold)}
+  .cell.today .num{color:var(--gold-text);font-weight:800}
+  .cell.sel{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:var(--gold-bd)}
+  .dots{position:absolute;left:6px;right:6px;bottom:6px;display:flex;gap:3px;flex-wrap:wrap}
+  .cdot{height:6px;width:6px;border-radius:999px}
+  .chip{font-size:10px;line-height:1.25;border-left:3px solid #ccc;background:#faf7f0;border-radius:3px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+  .chipmore{font-size:10px;color:var(--faint);font-weight:700;padding-left:4px;margin-top:1px}
+  .agday{font-size:13px;font-weight:700;color:var(--head);margin:18px 2px 8px}
+  .agday-sel{color:var(--gold-text)}
+  .cal-person{display:flex;align-items:center;gap:11px;padding:12px 0;border-top:1px solid #f4efe2}
+  .cal-person:first-child{border-top:0}
+  .dot{height:12px;width:12px;border-radius:999px;flex:0 0 auto}
+  .pname{font-weight:600;color:var(--head);font-size:14px;margin:0}
+  .psub{font-size:12px;color:var(--faint);margin:1px 0 0}
+  .toggle{border:1px solid var(--border);background:#fff;border-radius:999px;padding:6px 13px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
+  .toggle.on{background:var(--gold-bg);border-color:var(--gold-bd);color:var(--gold-text)}
+  .toggle.off{opacity:.6}
+  .ev{display:flex;gap:12px;padding:12px 14px;border-radius:12px;background:#fff;border:1px solid var(--border);margin-bottom:10px}
+  .ev .bar{width:4px;border-radius:999px;flex:0 0 auto}
+  .ev .etime{font-size:12px;color:var(--muted);font-weight:700;margin:0}
+  .ev .etitle{font-size:14px;color:var(--head);font-weight:500;margin:2px 0 0}
+  .ev .ewho{font-size:12px;color:var(--faint);margin:2px 0 0}
+  .sync-banner{margin-top:12px;border-radius:12px;background:var(--gold-bg);border:1px solid var(--gold-bd);padding:13px;font-size:13px;color:#6b5b3e}
+  .ben{border:1px solid var(--border);background:#fff;border-radius:16px;padding:16px 18px;margin-bottom:12px}
+  .ben-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .ben-title{margin:0;font-weight:600;color:var(--head);font-size:15px}
+  .star{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--gold-text);background:var(--gold-bg);border:1px solid var(--gold-bd);border-radius:999px;padding:2px 8px;margin-left:8px;white-space:nowrap}
+  .ben-desc{margin:9px 0 0;font-size:13px;color:var(--muted);line-height:1.55}
+  .ben-note{margin:9px 0 0;font-size:12px;color:var(--gold-text);font-weight:600}
+  .ben-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .st{border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+  .st-todo{background:#f5f3ec;color:#78716c;border-color:#e7e1d2}
+  .st-look{background:#fffbeb;color:#b45309;border-color:#fde68a}
+  .st-applied{background:#ede9fe;color:#6d28d9;border-color:#ddd6fe}
+  .st-approved{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+  .st-na{background:#f8f8f7;color:#a8a29e;border-color:#eeeae0}
+  nav{position:fixed;left:0;right:0;bottom:0;border-top:1px solid var(--border);background:rgba(255,253,244,.93);backdrop-filter:blur(8px)}
+  .navinner{max-width:640px;margin:0 auto;display:flex}
+  .navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:11px 0;border:0;background:none;cursor:pointer;color:var(--faint);font:inherit;font-size:11px;font-weight:600}
+  .navbtn:hover{color:var(--muted)}
+  .navbtn.active{color:var(--gold)}
+  .navbtn span{display:block}
+  @media(max-width:560px){.navbtn span{display:none}}
+  .hint{font-size:12px;color:var(--faint);margin:8px 2px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="brand">
+        <span class="logo"></span>
+        <h1>DeEtte&rsquo;s CareHub</h1>
+      </div>
+      <p class="sub">Caring for DeEtte, together &middot; Boise</p>
+    </div>
+    <div class="topright">
+      <p class="d">Tuesday, Jun 16</p>
+      <p class="m">Dad &middot; Sis (RN) &middot; You</p>
+    </div>
+  </div>
+  <div id="view"></div>
+</div>
+<nav><div class="navinner" id="nav"></div></nav>
+
+<script>
+function svg(inner,s){s=s||24;return '<svg xmlns="http://www.w3.org/2000/svg" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>';}
+var ICON={
+  home:function(s){return svg('<path d="M3 9.5L12 3l9 6.5"/><path d="M5 9.5V20h14V9.5"/>',s)},
+  pill:function(s){return svg('<rect x="3" y="8" width="18" height="8" rx="4"/><line x1="12" y1="8" x2="12" y2="16"/>',s)},
+  cal:function(s){return svg('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>',s)},
+  users:function(s){return svg('<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.3"/><path d="M16 14.2c2.3.4 4 2.4 4 4.8"/>',s)},
+  plane:function(s){return svg('<path d="M2 12l20-7-7 20-3-8-8-3z"/>',s)},
+  life:function(s){return svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><line x1="5.6" y1="5.6" x2="9.5" y2="9.5"/><line x1="18.4" y1="5.6" x2="14.5" y2="9.5"/><line x1="5.6" y1="18.4" x2="9.5" y2="14.5"/><line x1="18.4" y1="18.4" x2="14.5" y2="14.5"/>',s)},
+  check:function(s){return svg('<path d="M5 12l4 4L19 6"/>',s)},
+  clock:function(s){return svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',s)},
+  alert:function(s){return svg('<path d="M12 3l9 16H3z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="16.6" x2="12" y2="16.7"/>',s)},
+  plus:function(s){return svg('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',s)},
+  phone:function(s){return svg('<path d="M5 4h4l2 5-2 1c1 2 2 3 4 4l1-2 5 2v4c0 1-1 2-2 2A16 16 0 0 1 3 6c0-1 1-2 2-2z"/>',s)},
+  mappin:function(s){return svg('<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',s)},
+  file:function(s){return svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/>',s)},
+  heart:function(s){return svg('<path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3 1 6 4 3-3 4-4 6-4 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/>',s)},
+  coffee:function(s){return svg('<path d="M4 8h13v5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M17 9h2.5a2.5 2.5 0 0 1 0 5H17"/><line x1="7" y1="3" x2="7" y2="5"/><line x1="11" y1="3" x2="11" y2="5"/>',s)},
+  users2:function(s){return svg('<circle cx="9" cy="9" r="3.2"/><path d="M2.5 19c0-3.3 2.9-6 6.5-6s6.5 2.7 6.5 6"/><path d="M17 13c2.5 0 4.5 2 4.5 4.6"/><circle cx="18" cy="8" r="2.4"/>',s)},
+  chev:function(s){return svg('<path d="M9 6l6 6-6 6"/>',s)},
+  chevL:function(s){return svg('<path d="M15 6l-6 6 6 6"/>',s)},
+  clip:function(s){return svg('<rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><line x1="8.5" y1="10" x2="15.5" y2="10"/><line x1="8.5" y1="14" x2="15.5" y2="14"/>',s)},
+  sun:function(s){return svg('<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4.5"/><line x1="12" y1="19.5" x2="12" y2="22"/><line x1="2" y1="12" x2="4.5" y2="12"/><line x1="19.5" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="6.6" y2="6.6"/><line x1="17.4" y1="17.4" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="6.6" y2="17.4"/><line x1="17.4" y1="6.6" x2="19.1" y2="4.9"/>',s)},
+  landmark:function(s){return svg('<line x1="3" y1="21" x2="21" y2="21"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="6" y1="10" x2="6" y2="21"/><line x1="10" y1="10" x2="10" y2="21"/><line x1="14" y1="10" x2="14" y2="21"/><line x1="18" y1="10" x2="18" y2="21"/><path d="M12 3l8 6H4z"/>',s)}
+};
+document.querySelector('.logo').innerHTML = ICON.sun(20);
+
+var state={
+  tab:'today',
+  meds:[
+    {id:1,name:'Donepezil',dose:'10 mg',time:'8:00 AM',taken:true,prescriber:'Dr. Reyes (Neurology)',refillDays:6},
+    {id:2,name:'Memantine',dose:'10 mg',time:'8:00 AM',taken:true,prescriber:'Dr. Reyes (Neurology)',refillDays:21},
+    {id:3,name:'Lisinopril',dose:'20 mg',time:'12:00 PM',taken:false,prescriber:'Dr. Okafor (Primary)',refillDays:3},
+    {id:4,name:'Memantine',dose:'10 mg',time:'8:00 PM',taken:false,prescriber:'Dr. Reyes (Neurology)',refillDays:21},
+    {id:5,name:'Vitamin D',dose:'2000 IU',time:'8:00 PM',taken:false,prescriber:'OTC',refillDays:40}
+  ],
+  visits:[
+    {id:1,date:'Jun 24',time:'10:30 AM',doctor:'Dr. Reyes',type:'Neurology — 6-mo follow-up',who:'Dad',
+     questions:['Ask about recent evening restlessness','Review whether Donepezil dose still right']},
+    {id:2,date:'Jul 9',time:'2:00 PM',doctor:'Dr. Okafor',type:'Primary — blood pressure check',who:'Dad',questions:[]}
+  ],
+  pastVisits:[
+    {id:91,date:'May 12',doctor:'Dr. Reyes',summary:'MMSE stable vs. last visit. Continued Donepezil 10mg. Flagged sleep changes — try a consistent evening routine before considering meds.',changes:'No med changes.'}
+  ],
+  todos:[
+    {id:1,text:'Refill Lisinopril (only 3 days left)',who:'Dad',done:false},
+    {id:2,text:'Send Dr. Reyes the sleep log before Jun 24',who:'Sis (RN)',done:false},
+    {id:3,text:'Set up ride to neurology appt',who:'You',done:false},
+    {id:4,text:"Confirm HIPAA release on file at Dr. Okafor's office",who:'You',done:true}
+  ],
+  updates:[
+    {id:1,who:'Dad',when:'Today, 9:14 AM',text:'Good morning so far. DeEtte slept through the night, ate breakfast, took the 8am meds.'},
+    {id:2,who:'Sis (RN)',when:'Yesterday, 6:40 PM',text:'Called the pharmacy — they can sync all refills to the 1st of the month. Worth doing.'},
+    {id:3,who:'Dad',when:'Yesterday, 1:10 PM',text:'A little restless this afternoon but settled after a walk.'}
+  ],
+  dad:{lastBreak:'Jun 8', daysSince:8},
+  draft:'',
+  benefits:{},
+  cal:{y:2026,m:5,sel:'2026-06-24',connected:{Dad:false,Sis:false,You:false},shown:{Dad:true,Sis:true,You:true},sync:false}
+};
+
+var TABS=[
+  {id:'today',label:'Today',icon:'home'},
+  {id:'calendar',label:'Calendar',icon:'cal'},
+  {id:'meds',label:'Medications',icon:'pill'},
+  {id:'visits',label:'Doctor Visits',icon:'clip'},
+  {id:'coord',label:'Coordination',icon:'users'},
+  {id:'travel',label:'Travel',icon:'plane'},
+  {id:'resources',label:'Resources',icon:'life'},
+  {id:'benefits',label:'Benefits',icon:'landmark'}
+];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function avatar(n){var c=n[0]==='D'?'D':n[0]==='S'?'S':'Y';return '<span class="avatar av-'+c+'">'+esc(n.split(' ')[0].slice(0,2))+'</span>';}
+function trunc(s,n){return s.length>n?s.slice(0,n)+'…':s;}
+
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var CALS={DeEtte:{color:'#f59e0b'},Dad:{color:'#e11d48'},Sis:{color:'#7c3aed'},You:{color:'#0d9488'}};
+var EVENTS=[
+  {date:'2026-06-18',who:'DeEtte',time:'10:00 AM',title:'Memory Café (Boise Public Library)'},
+  {date:'2026-06-19',who:'Dad',time:'9:00 AM',title:'Pharmacy — refill pickup'},
+  {date:'2026-06-21',who:'You',time:'9:00 AM',title:'Drive up to Boise to visit'},
+  {date:'2026-06-22',who:'Dad',time:'3:00 PM',title:'Respite break — coffee with Jim'},
+  {date:'2026-06-24',who:'DeEtte',time:'10:30 AM',title:'Dr. Reyes — Neurology follow-up'},
+  {date:'2026-06-24',who:'Sis',time:'10:30 AM',title:'Join neurology visit by video'},
+  {date:'2026-06-25',who:'DeEtte',time:'11:00 AM',title:'Hair appointment'},
+  {date:'2026-06-28',who:'Sis',time:'6:00 PM',title:'Evening check-in call'},
+  {date:'2026-07-04',who:'You',time:'9:00 AM',title:'Visit Boise (holiday weekend)'},
+  {date:'2026-07-08',who:'Dad',time:'1:00 PM',title:'Eagle Caregiver Support Group'},
+  {date:'2026-07-09',who:'DeEtte',time:'2:00 PM',title:'Dr. Okafor — blood pressure check'}
+];
+function pad(n){return (n<10?'0':'')+n;}
+function ymd(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d);}
+function tmin(t){var mm=t.match(/(\d+):(\d+)\s*(AM|PM)/i);if(!mm)return 0;var hr=(+mm[1])%12;if(/PM/i.test(mm[3]))hr+=12;return hr*60+(+mm[2]);}
+function visibleWho(w){if(w==='DeEtte')return true;return state.cal.connected[w] && state.cal.shown[w];}
+function eventsOn(date){return EVENTS.filter(function(e){return e.date===date && visibleWho(e.who);});}
+
+var STATUS={todo:{label:'To do',cls:'st-todo'},looking:{label:'Looking into it',cls:'st-look'},applied:{label:'Applied',cls:'st-applied'},approved:{label:'Approved',cls:'st-approved'},na:{label:'Not now',cls:'st-na'}};
+var STATUS_ORDER=['todo','looking','applied','approved','na'];
+var BENEFITS=[
+ {group:'For DeEtte — income & coverage',items:[
+  {id:'ssdi',star:true,title:'Social Security Disability Insurance (SSDI)',desc:"Monthly disability income now that Alzheimer's keeps her from working. Early-onset Alzheimer's is on Social Security's Compassionate Allowances list, so the claim is fast-tracked &mdash; but payments still begin only after a 5-month wait, and Medicare follows about 24 months later. Apply as soon as possible, and state that it's early-onset Alzheimer's.",act:[{label:'Call SSA',href:'tel:18007721213'},{label:'Apply at ssa.gov',href:'https://www.ssa.gov/applyfordisability'}]},
+  {id:'medicare',title:'Medicare through SSDI',desc:"Once SSDI is approved she can get Medicare before 65 &mdash; generally after a 24-month waiting period. Worth lining up early so coverage is ready as the disease progresses.",act:[{label:'medicare.gov',href:'https://www.medicare.gov'}]},
+  {id:'persiearly',star:true,title:'PERSI — early retirement',desc:"A monthly pension from her teaching years. At 60, with about 15 years of service, she may be able to draw a reduced early-retirement benefit now. Ask PERSI for an estimate.",act:[{label:'persi.idaho.gov',href:'https://www.persi.idaho.gov'}]},
+  {id:'persidis',title:'PERSI — disability retirement',desc:"Possibly a disability pension, though it may be less likely since she stopped working a few years ago. Still worth asking PERSI directly.",act:[{label:'persi.idaho.gov',href:'https://www.persi.idaho.gov'}]},
+  {id:'waiver',star:true,title:'Idaho Medicaid — Aged & Disabled Waiver',desc:"If she qualifies medically and financially, this can help pay for in-home care, adult day health, respite, personal care, meals, transportation, and safety supports. Ask the CareLine for a screening.",act:[{label:'Call CareLine',href:'tel:18009262588'},{label:'healthandwelfare.idaho.gov',href:'https://healthandwelfare.idaho.gov'}]},
+  {id:'ccp',title:'Idaho Community Care Program',desc:"Dementia and memory-care case management, plus help connecting caregivers to services. Availability can depend on your county &mdash; ask the CareLine.",act:[{label:'Call CareLine',href:'tel:18009262588'}]}
+ ]},
+ {group:'For Dad — caregiver support & relief',items:[
+  {id:'aaa',star:true,title:'Area Agency on Aging (the front door)',desc:"The single best place to start for Idaho aging services. They connect your family to respite, the Family Caregiver Support Program, meals, transportation, adult day programs, case management, and dementia resources.",act:[{label:'Call 211 / CareLine',href:'tel:18009262588'},{label:'aging.idaho.gov',href:'https://aging.idaho.gov'}]},
+  {id:'fcsp',title:'Idaho Family Caregiver Support Program',desc:"Built for Dad specifically: respite care, caregiver training, support groups, care planning, and help navigating resources. Reached through the Area Agency on Aging / CareLine.",act:[{label:'Call 211 / CareLine',href:'tel:18009262588'}]},
+  {id:'respite',title:'Idaho Lifespan Respite',desc:"A real break for Dad &mdash; a paid caregiver, volunteer, adult day program, or temporary relief, depending on what's available locally. Ask how to access it.",act:[{label:'Call 211 / CareLine',href:'tel:18009262588'}]},
+  {id:'fmla',title:"Dad's FMLA (state employment)",desc:"Job-protected time off to take her to appointments and manage care transitions. Usually unpaid, but he may be able to use accrued leave.",note:'Start with his HR or benefits office to open the paperwork.'},
+  {id:'eap',title:"Dad's State Employee EAP",desc:"Free, confidential counseling, caregiver-stress support, and often eldercare resource referrals through his employee benefits &mdash; a quiet, no-cost place for him to be supported.",note:'Look in his employee benefits portal, or ask HR for the EAP contact.'}
+ ]},
+ {group:'Dementia guidance',items:[
+  {id:'alzid',title:"Alzheimer's Association Idaho & 24/7 Helpline",desc:"Dementia-specific guidance, support groups, care and safety planning, and help knowing exactly what to ask each program for. Free, any hour.",act:[{label:'Call 800-272-3900',href:'tel:18002723900'},{label:'alz.org/idaho',href:'https://www.alz.org/idaho'}]}
+ ]}
+];
+
+function viewToday(){
+  var due=state.meds.filter(function(m){return !m.taken;});
+  var low=state.meds.filter(function(m){return m.refillDays<=5;});
+  var open=state.todos.filter(function(t){return !t.done;});
+  var nv=state.visits[0];
+  var h='';
+  h+='<div class="hero"><div class="sundeco">'+ICON.sun(96)+'</div><h2>Good morning &#9728;&#65039;</h2><p>Here&rsquo;s DeEtte&rsquo;s day at a glance &mdash; her meds, her next visit, and the latest from the family. She&rsquo;s in good hands, and so are you.</p></div>';
+  h+='<div class="grid2">';
+  h+='<div class="card click" data-tab="meds" style="margin:0"><div class="stat-label">'+ICON.pill(16)+'Meds left today</div><div class="stat-num">'+due.length+'</div><p class="stat-sub">'+(due[0]?'Next: '+esc(due[0].name)+' at '+esc(due[0].time):'All done 🎉')+'</p></div>';
+  h+='<div class="card click" data-tab="coord" style="margin:0"><div class="stat-label">'+ICON.users(16)+'Open tasks</div><div class="stat-num">'+open.length+'</div><p class="stat-sub">'+(open[0]?esc(open[0].who)+': '+esc(trunc(open[0].text,22)):'Nothing pending')+'</p></div>';
+  h+='</div>';
+  if(low.length){
+    h+='<div class="card warn" style="margin-top:14px"><div class="row" style="align-items:flex-start"><span style="color:var(--warn)">'+ICON.alert(20)+'</span><div><p style="margin:0;font-weight:700;color:var(--warn-text)">Refill needed soon</p><p class="sm" style="margin:4px 0 0;color:var(--warn-text)">'+low.map(function(m){return esc(m.name)+' ('+m.refillDays+'d)';}).join(', ')+'</p></div></div></div>';
+  }
+  if(nv){
+    h+='<div class="sec">Next appointment</div><div class="card"><div class="sec-row"><div><p style="margin:0;font-weight:600;color:var(--head)">'+esc(nv.type)+'</p><p class="sm muted" style="margin:4px 0 0">'+esc(nv.date)+' · '+esc(nv.time)+' · with '+esc(nv.doctor)+'</p></div><span class="pill">'+esc(nv.who)+' taking her</span></div></div>';
+  }
+  h+='<div class="sec sec-row" style="align-items:center"><span>Latest from the family</span><button class="link" data-tab="coord">View all '+ICON.chev(14)+'</button></div>';
+  h+='<div class="card">';
+  state.updates.slice(0,2).forEach(function(u){
+    h+='<div class="upd">'+avatar(u.who)+'<div><p class="sm" style="margin:0"><span class="name">'+esc(u.who)+'</span> <span class="when">· '+esc(u.when)+'</span></p><p class="sm muted" style="margin:0">'+esc(u.text)+'</p></div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+function viewMeds(){
+  var low=state.meds.filter(function(m){return m.refillDays<=5;});
+  var h='<div class="sec first">Today\'s doses — tap to check off</div>';
+  state.meds.forEach(function(m){
+    h+='<div class="med'+(m.taken?' on':'')+'" data-med="'+m.id+'">'
+      +'<span class="check">'+ICON.check(18)+'</span>'
+      +'<div class="grow"><p class="med-name">'+esc(m.name)+' <span class="muted" style="font-weight:400">· '+esc(m.dose)+'</span></p><p class="sm muted" style="margin:0">'+esc(m.prescriber)+'</p></div>'
+      +'<div class="right"><p class="time">'+ICON.clock(13)+' '+esc(m.time)+'</p><p class="refill'+(m.refillDays<=5?' low':'')+'">refill in '+m.refillDays+'d</p></div>'
+      +'</div>';
+  });
+  if(low.length){h+='<p class="hint">Tip: ask the pharmacy to sync all refills to the same date so this list stays simple.</p>';}
+  return h;
+}
+
+function viewVisits(){
+  var h='<div class="sec first sec-row"><span>Upcoming</span><button class="link">'+ICON.plus(14)+' Add</button></div>';
+  state.visits.forEach(function(v){
+    h+='<div class="card"><div class="sec-row" style="align-items:flex-start"><div><p style="margin:0;font-weight:600;color:var(--head)">'+esc(v.type)+'</p><p class="sm muted" style="margin:4px 0 0">'+esc(v.date)+' · '+esc(v.time)+' · '+esc(v.doctor)+'</p></div><span class="pill">'+esc(v.who)+'</span></div>';
+    if(v.questions.length){
+      h+='<div class="qbox"><p>Questions to ask</p><ul>'+v.questions.map(function(q){return '<li>• '+esc(q)+'</li>';}).join('')+'</ul></div>';
+    }
+    h+='</div>';
+  });
+  h+='<div class="sec">Past visits</div>';
+  state.pastVisits.forEach(function(v){
+    h+='<div class="card"><p class="sm" style="margin:0;font-weight:600;color:var(--head)">'+esc(v.date)+' · '+esc(v.doctor)+'</p><p class="sm muted" style="margin:8px 0 0">'+esc(v.summary)+'</p><p class="sm" style="margin:8px 0 0;font-weight:500;color:var(--text)">'+esc(v.changes)+'</p></div>';
+  });
+  return h;
+}
+
+function viewCoord(){
+  var h='<div class="sec first">Shared to-do</div><div class="card flush list">';
+  state.todos.forEach(function(t){
+    h+='<button class="item'+(t.done?' done':'')+'" data-todo="'+t.id+'"><span class="box">'+ICON.check(14)+'</span><span class="txt">'+esc(t.text)+'</span><span class="tag">'+esc(t.who)+'</span></button>';
+  });
+  h+='</div>';
+  h+='<div class="sec">Updates</div><div class="card"><textarea id="draft" rows="2" placeholder="Share a quick update with Dad and Sis…">'+esc(state.draft)+'</textarea><div class="btn-row"><button class="btn" data-post="1">Post update</button></div></div>';
+  state.updates.forEach(function(u){
+    h+='<div class="card" style="display:flex;gap:12px">'+avatar(u.who)+'<div><p class="sm" style="margin:0"><span class="name">'+esc(u.who)+'</span> <span class="when">· '+esc(u.when)+'</span></p><p class="sm muted" style="margin:2px 0 0">'+esc(u.text)+'</p></div></div>';
+  });
+  return h;
+}
+
+function viewTravel(){
+  var chk=['Medication list (drug, dose, timing) — printed copy','All meds in carry-on, not checked luggage','Insurance card + Medicare card','Doctor contact numbers (neurology + primary)','Recent photo of DeEtte (in case you\'re separated)','Comfort items & familiar snacks for the trip','Location tracker / ID bracelet charged & on'];
+  var rows=[['heart','Diagnosis',"Early-onset Alzheimer's (dx 2024)"],['pill','Key meds','Donepezil 10mg, Memantine 10mg ×2'],['alert','Allergies','Penicillin'],['phone','In emergency, call','Dad · (208) 555-0142'],['file','Neurologist','Dr. Reyes · (208) 555-0188'],['mappin','Home','Boise, ID']];
+  var h='<div class="card warm"><p class="sm" style="margin:0;color:var(--gold-text)">Traveling with someone who has memory changes goes smoother with a fixed routine and everything important on paper, not just on a phone.</p></div>';
+  h+='<div class="sec">Emergency card</div><div class="card">';
+  rows.forEach(function(r){h+='<div class="irow"><span class="ibadge">'+ICON[r[0]](16)+'</span><div><p class="ilabel">'+esc(r[1])+'</p><p class="ival">'+esc(r[2])+'</p></div></div>';});
+  h+='</div><p class="hint">Keep a printed copy in her bag and a photo of this on every family phone.</p>';
+  h+='<div class="sec">Trip checklist</div><div class="card flush">';
+  chk.forEach(function(c){h+='<label class="chk-line"><input type="checkbox"> '+esc(c)+'</label>';});
+  h+='</div>';
+  return h;
+}
+
+function viewCalendar(){
+  var c=state.cal,y=c.y,m=c.m;
+  var first=new Date(y,m,1).getDay();
+  var ndays=new Date(y,m+1,0).getDate();
+  var today=ymd(2026,5,16);
+  var h='<div class="cal-head"><div class="cal-title">'+MONTHS[m]+' '+y+'</div><div class="cal-nav"><button data-cal-nav="-1" aria-label="Previous month">'+ICON.chevL(18)+'</button><button data-cal-nav="1" aria-label="Next month">'+ICON.chev(18)+'</button></div></div>';
+  h+='<div class="grid7">';
+  WD.forEach(function(d){h+='<div class="wd">'+d+'</div>';});
+  for(var b=0;b<first;b++){h+='<div class="cell blank"></div>';}
+  for(var d=1;d<=ndays;d++){
+    var date=ymd(y,m,d);
+    var evs=eventsOn(date);
+    var cls='cell';
+    if(date===today)cls+=' today';
+    if(date===c.sel)cls+=' sel';
+    var chips='';
+    evs.slice(0,2).forEach(function(e){chips+='<span class="chip" style="border-color:'+CALS[e.who].color+'">'+esc(e.title)+'</span>';});
+    if(evs.length>2){chips+='<span class="chipmore">+'+(evs.length-2)+' more</span>';}
+    h+='<div class="'+cls+'" data-day="'+date+'"><span class="num">'+d+'</span>'+chips+'</div>';
+  }
+  h+='</div>';
+
+  h+='<div class="sec">Calendars</div><div class="card">';
+  h+='<div class="cal-person"><span class="dot" style="background:'+CALS.DeEtte.color+'"></span><div><p class="pname">DeEtte</p><p class="psub">Base calendar &middot; her care &amp; appointments</p></div><span class="toggle on" style="margin-left:auto;cursor:default">Base</span></div>';
+  ['Dad','Sis','You'].forEach(function(p){
+    var connected=c.connected[p],shown=c.shown[p];
+    var label=p==='Sis'?'Sis (RN)':p;
+    var right=connected?('<button class="toggle '+(shown?'on':'off')+'" data-toggle="'+p+'" style="margin-left:auto">'+(shown?'Shown':'Hidden')+'</button>'):('<button class="rbtn" data-connect="'+p+'" style="margin-left:auto">Connect</button>');
+    var sub=connected?'Synced &middot; tap to show or hide':'Not connected yet';
+    h+='<div class="cal-person"><span class="dot" style="background:'+CALS[p].color+(connected?'':';opacity:.3')+'"></span><div><p class="pname">'+label+'</p><p class="psub">'+sub+'</p></div>'+right+'</div>';
+  });
+  h+='</div>';
+  if(c.sync){h+='<div class="sync-banner">In the finished app, each person connects their Google or Apple calendar once and their events appear here automatically, layered over DeEtte&rsquo;s base calendar. These are sample events for now.</div>';}
+
+  var monthEvs=EVENTS.filter(function(e){var p=e.date.split('-');return (+p[0])===y && ((+p[1]-1)===m) && visibleWho(e.who);}).sort(function(a,b){return a.date===b.date?(tmin(a.time)-tmin(b.time)):(a.date<b.date?-1:1);});
+  h+='<div class="sec">Agenda &middot; '+MONTHS[m]+' '+y+'</div>';
+  if(!monthEvs.length){
+    h+='<div class="card"><p class="sm muted" style="margin:0">No events this month yet &mdash; connect a calendar above to see everyone&rsquo;s plans here.</p></div>';
+  } else {
+    var lastDate=null;
+    monthEvs.forEach(function(e){
+      if(e.date!==lastDate){
+        lastDate=e.date;
+        var p=e.date.split('-');var dt=new Date(+p[0],+p[1]-1,+p[2]);
+        h+='<p class="agday'+(e.date===c.sel?' agday-sel':'')+'">'+WD[dt.getDay()]+', '+MONTHS[+p[1]-1]+' '+(+p[2])+'</p>';
+      }
+      var col=CALS[e.who].color,who=e.who==='Sis'?'Sis (RN)':e.who;
+      h+='<div class="ev"><span class="bar" style="background:'+col+'"></span><div><p class="etime">'+esc(e.time)+'</p><p class="etitle">'+esc(e.title)+'</p><p class="ewho">'+esc(who)+'</p></div></div>';
+    });
+  }
+  h+='<p class="hint">Tap a day to jump to it. Connect Dad&rsquo;s, Sis&rsquo;s, and your calendars above to layer everyone&rsquo;s plans over DeEtte&rsquo;s.</p>';
+  return h;
+}
+
+function viewBenefits(){
+  var h='<div class="hero"><div class="sundeco">'+ICON.landmark(86)+'</div><h2>Benefits &amp; financial support</h2><p>Early-onset Alzheimer&rsquo;s opens doors many families miss &mdash; income, coverage, and respite. Applying early matters. Track each one here so all three of you can see what&rsquo;s in motion.</p></div>';
+  var stars=[];
+  BENEFITS.forEach(function(g){g.items.forEach(function(it){if(it.star)stars.push(it);});});
+  h+='<div class="sec first">Start with these four</div><div class="card warm"><ol style="margin:0;padding-left:18px;color:var(--text)">';
+  stars.forEach(function(it){h+='<li style="margin:6px 0;font-size:14px"><strong>'+esc(it.title)+'</strong></li>';});
+  h+='</ol><p class="sm" style="margin:10px 0 0;color:#6b5b3e">These have the biggest impact. Tap any program below to set its status &mdash; To do, Looking into it, Applied, or Approved &mdash; so the whole family can see progress.</p></div>';
+  BENEFITS.forEach(function(g){
+    h+='<div class="sec">'+esc(g.group)+'</div>';
+    g.items.forEach(function(it){
+      var st=state.benefits[it.id]||'todo';
+      var s=STATUS[st];
+      h+='<div class="ben"><div class="ben-top"><p class="ben-title">'+esc(it.title)+(it.star?'<span class="star">'+ICON.sun(11)+'Start here</span>':'')+'</p><button class="st '+s.cls+'" data-benefit="'+it.id+'">'+s.label+'</button></div>';
+      h+='<p class="ben-desc">'+it.desc+'</p>';
+      if(it.note){h+='<p class="ben-note">'+it.note+'</p>';}
+      if(it.act){h+='<div class="ben-act">';it.act.forEach(function(a){var tel=a.href.indexOf('tel:')===0;h+='<a class="rbtn" href="'+a.href+'"'+(tel?'':' target="_blank" rel="noopener"')+'>'+a.label+'</a>';});h+='</div>';}
+      h+='</div>';
+    });
+  });
+  h+='<p class="hint">General information, not legal or financial advice &mdash; confirm eligibility and details with each program. Phone numbers current as of June 2026.</p>';
+  return h;
+}
+
+function viewResources(){
+  var d=state.dad;
+  var overdue=d.daysSince>=7;
+  var h='<div class="hero"><div class="sundeco">'+ICON.heart(92)+'</div><h2>Caring for the caregiver</h2><p>Dad carries the most each day. Looking after him &mdash; rest, backup, community &mdash; keeps DeEtte well cared for too.</p></div>';
+
+  // Featured: next support group for Dad
+  h+='<div class="sec first">Dad&rsquo;s next support group</div>';
+  h+='<div class="card event">'
+    +'<div class="event-top"><span class="event-date"><span class="mon">JUL</span><span class="day">8</span></span>'
+    +'<div><p class="event-title">Eagle Caregiver Support Group</p><p class="event-meta">Wed, July 8, 2026 &middot; 1:00&ndash;3:00 PM MDT</p></div></div>'
+    +'<div class="event-row">'+ICON.mappin(16)+'<span>Eagle Senior Center &middot; 312 E State St, Eagle, ID 83616</span></div>'
+    +'<div class="event-row">'+ICON.cal(16)+'<span>Meets the 2nd Wednesday of each month, 1&ndash;3 p.m.</span></div>'
+    +'<p class="event-desc">A safe, confidential space to share with others who get it, learn about dementia, and pick up practical ways to handle the hard days.</p>'
+    +'<div class="event-actions">'
+      +'<a class="rbtn" href="https://www.google.com/maps/search/?api=1&amp;query=Eagle%20Senior%20Center%20312%20E%20State%20St%20Eagle%20ID%2083616" target="_blank" rel="noopener">Directions</a>'
+      +'<a class="rbtn" href="tel:18002723900">Call to register</a>'
+      +'<a class="rbtn" href="https://www.alz.org/idaho" target="_blank" rel="noopener">Chapter site</a>'
+    +'</div>'
+  +'</div>';
+
+  // Dad wellbeing card
+  h+='<div class="sec">Looking after Dad</div>';
+  h+='<div class="card"><div class="row" style="align-items:flex-start">'+avatar('Dad')+'<div class="grow"><p style="margin:0;font-weight:600;color:var(--head)">Dad &middot; DeEtte&rsquo;s primary caregiver</p><p class="sm muted" style="margin:3px 0 0">Last real break: '+esc(d.lastBreak)+(d.daysSince>0?' &middot; '+d.daysSince+' days ago':' &middot; today')+'</p></div></div>';
+  if(overdue){
+    h+='<div class="nudge">A gentle nudge: it&rsquo;s been over a week. Even a few hours off &mdash; a walk, coffee with a friend, a nap &mdash; protects his health, not just hers.</div>';
+  }
+  h+='<button class="btn" data-action="break" style="margin-top:12px">'+ICON.coffee(16)+' &nbsp;Log a break for Dad today</button>';
+  h+='<p class="hint">Worried he seems worn down? Drop a note in Coordination so all three of you see it.</p>';
+  h+='</div>';
+
+  // Helplines
+  var calls=[
+    {icon:'phone',title:"Alzheimer's Association Helpline",sub:'24/7, every day &middot; free &amp; confidential',num:'800-272-3900',tel:'18002723900'},
+    {icon:'phone',title:"Alzheimer's Foundation of America",sub:'7 days/week &middot; dementia-trained social workers',num:'866-232-8484',tel:'18662328484'},
+    {icon:'mappin',title:'Eldercare Locator',sub:'Find local respite &amp; services near Boise',num:'800-677-1116',tel:'18006771116'}
+  ];
+  h+='<div class="sec">Talk to someone (free)</div><div class="card flush">';
+  calls.forEach(function(c){
+    h+='<div class="res"><span class="ibadge">'+ICON[c.icon](16)+'</span><div class="grow"><p class="rtitle">'+c.title+'</p><p class="rsub">'+c.sub+' &middot; <strong>'+c.num+'</strong></p></div><a class="rbtn" href="tel:'+c.tel+'">Call</a></div>';
+  });
+  h+='</div>';
+
+  // Community
+  h+='<div class="sec">Community &amp; support groups</div>';
+  h+='<div class="card"><div class="row" style="align-items:flex-start">'+'<span class="ibadge">'+ICON.users2(16)+'</span>'+'<div class="grow"><p style="margin:0;font-weight:600;color:var(--head)">You don&rsquo;t have to do this alone</p><p class="sm muted" style="margin:4px 0 0">Free in-person caregiver support groups meet around the Boise area &mdash; the helpline above can point you to the nearest one. There&rsquo;s also a 24/7 online community for caregivers who get it.</p></div></div><div class="btn-row" style="justify-content:flex-start;margin-top:12px"><a class="rbtn" href="https://www.alzconnected.org" target="_blank" rel="noopener">Open online community</a></div></div>';
+
+  // Learn
+  h+='<div class="sec">Learn together</div>';
+  h+='<div class="card flush">';
+  h+='<div class="res"><span class="ibadge">'+ICON.file(16)+'</span><div class="grow"><p class="rtitle">Alzheimer&rsquo;s Association — Caregiver Center</p><p class="rsub">Stage-by-stage guidance, daily care tips, planning</p></div><a class="rbtn" href="https://www.alz.org/help-support/caregiving" target="_blank" rel="noopener">Open</a></div>';
+  h+='<div class="res"><span class="ibadge">'+ICON.heart(16)+'</span><div class="grow"><p class="rtitle">Respite &amp; taking time off</p><p class="rsub">How short breaks work and how to fund them</p></div><a class="rbtn" href="https://www.alz.org/help-support/caregiving/care-options/respite-care" target="_blank" rel="noopener">Open</a></div>';
+  h+='</div>';
+
+  h+='<p class="hint">Phone numbers were current as of June 2026. Your local Area Agency on Aging can point you to Boise-specific respite and in-home help.</p>';
+  return h;
+}
+
+function render(){
+  var y=window.scrollY;
+  var v=document.getElementById('view');
+  if(state.tab==='today')v.innerHTML=viewToday();
+  else if(state.tab==='meds')v.innerHTML=viewMeds();
+  else if(state.tab==='visits')v.innerHTML=viewVisits();
+  else if(state.tab==='coord')v.innerHTML=viewCoord();
+  else if(state.tab==='travel')v.innerHTML=viewTravel();
+  else if(state.tab==='calendar')v.innerHTML=viewCalendar();
+  else if(state.tab==='benefits')v.innerHTML=viewBenefits();
+  else v.innerHTML=viewResources();
+
+  var nav=document.getElementById('nav');
+  nav.innerHTML=TABS.map(function(t){
+    return '<button class="navbtn'+(state.tab===t.id?' active':'')+'" data-tab="'+t.id+'">'+ICON[t.icon](20)+'<span>'+t.label+'</span></button>';
+  }).join('');
+  window.scrollTo(0,y);
+}
+
+document.addEventListener('click',function(e){
+  var tabBtn=e.target.closest('[data-tab]');
+  if(tabBtn){state.tab=tabBtn.getAttribute('data-tab');state.draft='';render();window.scrollTo(0,0);return;}
+  var med=e.target.closest('[data-med]');
+  if(med){var id=+med.getAttribute('data-med');state.meds.forEach(function(m){if(m.id===id)m.taken=!m.taken;});render();return;}
+  var todo=e.target.closest('[data-todo]');
+  if(todo){var tid=+todo.getAttribute('data-todo');state.todos.forEach(function(t){if(t.id===tid)t.done=!t.done;});render();return;}
+  var act=e.target.closest('[data-action]');
+  if(act && act.getAttribute('data-action')==='break'){state.dad.lastBreak='Today';state.dad.daysSince=0;render();return;}
+  var navb=e.target.closest('[data-cal-nav]');
+  if(navb){var dir=+navb.getAttribute('data-cal-nav');state.cal.m+=dir;if(state.cal.m<0){state.cal.m=11;state.cal.y--;}if(state.cal.m>11){state.cal.m=0;state.cal.y++;}render();return;}
+  var day=e.target.closest('[data-day]');
+  if(day){state.cal.sel=day.getAttribute('data-day');render();return;}
+  var conn=e.target.closest('[data-connect]');
+  if(conn){var cp=conn.getAttribute('data-connect');state.cal.connected[cp]=true;state.cal.shown[cp]=true;state.cal.sync=true;render();return;}
+  var tog=e.target.closest('[data-toggle]');
+  if(tog){var tp=tog.getAttribute('data-toggle');state.cal.shown[tp]=!state.cal.shown[tp];render();return;}
+  var ben=e.target.closest('[data-benefit]');
+  if(ben){var bid=ben.getAttribute('data-benefit');var cur=state.benefits[bid]||'todo';var bi=STATUS_ORDER.indexOf(cur);state.benefits[bid]=STATUS_ORDER[(bi+1)%STATUS_ORDER.length];render();return;}
+  if(e.target.closest('[data-post]')){
+    var ta=document.getElementById('draft');var val=ta?ta.value.trim():'';
+    if(val){state.updates.unshift({id:Date.now(),who:'You',when:'Just now',text:val});state.draft='';render();}
+    return;
+  }
+});
+document.addEventListener('input',function(e){if(e.target.id==='draft')state.draft=e.target.value;});
+
+render();
+</script>
+</body>
+</html>
